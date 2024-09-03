@@ -1,0 +1,219 @@
+Voy a mostrarte cómo puedes implementar un sistema en Java RMI con tres servidores que realizan operaciones diferentes (suma, resta y multiplicación) y un cliente que provee dos números. Cada servidor también proporcionará un mensaje de texto relacionado con su operación.
+
+### Estructura del Proyecto
+
+El proyecto tendrá cinco clases:
+
+1. **Operaciones**: La interfaz remota que define los métodos.
+2. **ServidorSuma**: Implementación del servidor para sumar los números.
+3. **ServidorResta**: Implementación del servidor para restar los números.
+4. **ServidorMultiplicacion**: Implementación del servidor para multiplicar los números.
+5. **Cliente**: El cliente que invoca los métodos remotos.
+
+### 1. Interfaz Remota: `Operaciones.java`
+
+```java
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface Operaciones extends Remote {
+    public int operar(int a, int b) throws RemoteException;
+    public String obtenerMensaje() throws RemoteException;
+}
+```
+
+### 2. Implementación del Servidor Suma: `ServidorSuma.java`
+
+```java
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class ServidorSuma extends UnicastRemoteObject implements Operaciones {
+
+    protected ServidorSuma() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public int operar(int a, int b) throws RemoteException {
+        return a + b;
+    }
+
+    @Override
+    public String obtenerMensaje() throws RemoteException {
+        return "La suma de los números es: ";
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServidorSuma suma = new ServidorSuma();
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.rebind("ServidorSuma", suma);
+            System.out.println("Servidor Suma listo.");
+        } catch (Exception e) {
+            System.err.println("Excepción en Servidor Suma: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### 3. Implementación del Servidor Resta: `ServidorResta.java`
+
+```java
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class ServidorResta extends UnicastRemoteObject implements Operaciones {
+
+    protected ServidorResta() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public int operar(int a, int b) throws RemoteException {
+        return a - b;
+    }
+
+    @Override
+    public String obtenerMensaje() throws RemoteException {
+        return "La resta de los números es: ";
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServidorResta resta = new ServidorResta();
+            Registry registry = LocateRegistry.createRegistry(1100);
+            registry.rebind("ServidorResta", resta);
+            System.out.println("Servidor Resta listo.");
+        } catch (Exception e) {
+            System.err.println("Excepción en Servidor Resta: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### 4. Implementación del Servidor Multiplicación: `ServidorMultiplicacion.java`
+
+```java
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class ServidorMultiplicacion extends UnicastRemoteObject implements Operaciones {
+
+    protected ServidorMultiplicacion() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public int operar(int a, int b) throws RemoteException {
+        return a * b;
+    }
+
+    @Override
+    public String obtenerMensaje() throws RemoteException {
+        return "La multiplicación de los números es: ";
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServidorMultiplicacion multiplicacion = new ServidorMultiplicacion();
+            Registry registry = LocateRegistry.createRegistry(1101);
+            registry.rebind("ServidorMultiplicacion", multiplicacion);
+            System.out.println("Servidor Multiplicación listo.");
+        } catch (Exception e) {
+            System.err.println("Excepción en Servidor Multiplicación: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### 5. Cliente: `Cliente.java`
+
+```java
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class Cliente {
+    public static void main(String[] args) {
+        try {
+            int a = 5;
+            int b = 3;
+
+            // Conectar al Servidor de Suma
+            Registry registrySuma = LocateRegistry.getRegistry("localhost", 1099);
+            Operaciones suma = (Operaciones) registrySuma.lookup("ServidorSuma");
+            System.out.println(suma.obtenerMensaje() + suma.operar(a, b));
+
+            // Conectar al Servidor de Resta
+            Registry registryResta = LocateRegistry.getRegistry("localhost", 1100);
+            Operaciones resta = (Operaciones) registryResta.lookup("ServidorResta");
+            System.out.println(resta.obtenerMensaje() + resta.operar(a, b));
+
+            // Conectar al Servidor de Multiplicación
+            Registry registryMultiplicacion = LocateRegistry.getRegistry("localhost", 1101);
+            Operaciones multiplicacion = (Operaciones) registryMultiplicacion.lookup("ServidorMultiplicacion");
+            System.out.println(multiplicacion.obtenerMensaje() + multiplicacion.operar(a, b));
+
+        } catch (Exception e) {
+            System.err.println("Excepción en Cliente: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Pasos para Ejecutar en Windows
+
+1. **Compilar los archivos**: Abre `Símbolo del sistema` (CMD) en la carpeta donde están tus archivos `.java` y compílalos con:
+
+   ```bash
+   javac *.java
+   ```
+
+2. **Iniciar los servidores**:
+   - Abre tres ventanas de `CMD` diferentes.
+   - En la primera ventana, inicia el **Servidor Suma** con:
+
+     ```bash
+     java ServidorSuma
+     ```
+
+   - En la segunda ventana, inicia el **Servidor Resta** con:
+
+     ```bash
+     java ServidorResta
+     ```
+
+   - En la tercera ventana, inicia el **Servidor Multiplicación** con:
+
+     ```bash
+     java ServidorMultiplicacion
+     ```
+
+3. **Ejecutar el Cliente**:
+   - Abre otra ventana de `CMD`, navega a la carpeta donde están los archivos `.class` y ejecuta el cliente:
+
+     ```bash
+     java Cliente
+     ```
+
+### Resultado Esperado
+
+El cliente debería mostrar algo como:
+
+```
+La suma de los números es: 8
+La resta de los números es: 2
+La multiplicación de los números es: 15
+```
+
+Con este sistema, cada servidor realiza una operación diferente y devuelve un mensaje específico junto con el resultado de la operación.

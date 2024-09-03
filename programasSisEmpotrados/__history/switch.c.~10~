@@ -1,0 +1,14 @@
+#include<16F877A.h>
+#use delay(clock4M)
+#fuses XT,NOWDT
+#use standard_io(B)
+
+main(void){
+do{
+OUTPUT_HIGH(PIN_B0);
+delay_ms(500);
+OUTPUT_LOW(PIN_B0);
+delay_ms(500);
+}
+while(TRUE);
+}

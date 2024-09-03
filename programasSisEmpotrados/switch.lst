@@ -1,0 +1,99 @@
+CCS PCM C Compiler, Version 5.015, 5967               28-ago.-24 16:35
+
+               Filename:   C:\Users\Luis Pach\Desktop\programasLocales\programasSisDistribuidos\switch.lst
+
+               ROM used:   34 words (0%)
+                           Largest free fragment is 2048
+               RAM used:   7 (2%) at main() level
+                           7 (2%) worst case
+               Stack used: 0 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   004
+0003:  NOP
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #fuses XT, NOWDT 
+.................... #use delay (clock = 4000000) 
+....................  
+.................... // Configuración del puerto A 
+.................... #BYTE TRISA = 0X85 
+.................... #BYTE PORTA = 0X05 
+....................  
+.................... // Configuración del puerto B 
+.................... #BYTE TRISB = 0X86 
+.................... #BYTE PORTB = 0X06 
+....................  
+.................... #BYTE OPTION_REG = 0X81 
+....................  
+.................... void main() 
+0004:  MOVF   03,W
+0005:  ANDLW  1F
+0006:  MOVWF  03
+0007:  BSF    03.5
+0008:  BSF    1F.0
+0009:  BSF    1F.1
+000A:  BSF    1F.2
+000B:  BCF    1F.3
+000C:  MOVLW  07
+000D:  MOVWF  1C
+000E:  BCF    03.7
+.................... { 
+....................    // Configuración del puerto A 
+....................    bit_clear(OPTION_REG, 7); 
+000F:  BCF    01.7
+....................    bit_set(TRISA, 0);     // RA0 como entrada 
+0010:  BSF    05.0
+....................    bit_set(TRISA, 1);     // RA1 como entrada 
+0011:  BSF    05.1
+....................    bit_clear(PORTA, 0);   // Asegura que RA0 está en bajo 
+0012:  BCF    03.5
+0013:  BCF    05.0
+....................    bit_clear(PORTA, 1);   // Asegura que RA1 está en bajo 
+0014:  BCF    05.1
+....................     
+....................    // Configuración del puerto B 
+....................    bit_clear(TRISB, 0);   // RB0 como salida 
+0015:  BSF    03.5
+0016:  BCF    06.0
+....................    bit_clear(PORTB, 0);   // Asegura que RB0 está en bajo 
+0017:  BCF    03.5
+0018:  BCF    06.0
+....................  
+....................    while(1){ 
+....................       if(bit_test(PORTA, 0) == 1 || bit_test(PORTA, 1) == 1) 
+0019:  BTFSC  05.0
+001A:  GOTO   01D
+001B:  BTFSS  05.1
+001C:  GOTO   01F
+....................          bit_set(PORTB, 0);   // Si RA0 o RA1 están en alto, enciende RB0 
+001D:  BSF    06.0
+001E:  GOTO   020
+....................       else 
+....................          bit_clear(PORTB, 0); // Si ambos están en bajo, apaga RB0 
+001F:  BCF    06.0
+0020:  GOTO   019
+....................    }   
+.................... } 
+....................  
+0021:  SLEEP
+....................  
+
+Configuration Fuses:
+   Word  1: 3F71   XT NOWDT PUT BROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

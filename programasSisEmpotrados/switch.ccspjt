@@ -1,0 +1,19 @@
+[PROJECT]
+Target=switch.hex
+Processor_Text=PIC16F877A
+CCSVersion=5.015
+Compiler=PCM
+[Target Data]
+FileList=switch.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[switch.c]
+Type=4
+[mru-list]
+1=switch.c
+[Opened Files]
+1=switch.c
+2=
+[Units]
+Count=1
+1=switch (main)
