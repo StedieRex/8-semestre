@@ -4,13 +4,23 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
 def camara():
-    # Rango para resaltar el color blanco en HSV
-    h_min = 0
-    h_max = 180  # Hue en OpenCV va de 0 a 180
-    s_min = 0
-    s_max = 60  # Saturación baja para captar el blanco
-    v_min = 200
-    v_max = 255  # Valores altos de brillo
+    # Rango para resaltar el color blanco y amarillo en HSV
+    # Blanco: Baja saturación, alto brillo
+    # Amarillo: Saturación moderada, tono amarillo
+    h_min_blanco = 0
+    h_max_blanco = 180  # Hue en OpenCV va de 0 a 180
+    s_min_blanco = 0
+    s_max_blanco = 60  # Saturación baja para captar el blanco
+    v_min_blanco = 200
+    v_max_blanco = 255  # Valores altos de brillo
+
+    # Rango para amarillo
+    h_min_amarillo = 10
+    h_max_amarillo = 30  # Tono específico del amarillo
+    s_min_amarillo = 100
+    s_max_amarillo = 255  # Saturación más alta para amarillo
+    v_min_amarillo = 150
+    v_max_amarillo = 255  # Amarillo es brillante también
 
     def cargar_video():
         Tk().withdraw()  # Ocultar la ventana principal de tkinter
@@ -36,12 +46,18 @@ def camara():
             hsv = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2HSV)
 
             # Aplicar los valores HSV para resaltar el color blanco
-            mascara = cv2.inRange(hsv, (h_min, s_min, v_min), (h_max, s_max, v_max))
+            mascara_blanco = cv2.inRange(hsv, (h_min_blanco, s_min_blanco, v_min_blanco), (h_max_blanco, s_max_blanco, v_max_blanco))
+
+            # Aplicar los valores HSV para resaltar el color amarillo
+            mascara_amarillo = cv2.inRange(hsv, (h_min_amarillo, s_min_amarillo, v_min_amarillo), (h_max_amarillo, s_max_amarillo, v_max_amarillo))
+
+            # Combinar ambas máscaras (blanco y amarillo)
+            mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
             result = cv2.bitwise_and(frame_rgb, frame_rgb, mask=mascara)
 
             # Mostrar la imagen enmascarada y el video original
             cv2.imshow('Original', frame)
-            cv2.imshow('Resaltado Blanco', result)
+            cv2.imshow('Resaltado Blanco y Amarillo', result)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
