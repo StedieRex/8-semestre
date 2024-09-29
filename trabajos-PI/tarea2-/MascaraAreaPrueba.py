@@ -30,7 +30,10 @@ if not ret:
 mask = np.zeros(first_frame.shape[:2], dtype="uint8")
 
 # Define las coordenadas de las cuatro esquinas del rectángulo irregular
-puntos = np.array([[100, 100], [500, 150], [450, 500], [120, 480]])
+# [x, y] = [columna, fila]
+#puntos = np.array([[481, 466], [742, 457], [226, 703], [1146, 668]])
+#correccion de puntos
+puntos = np.array([[481, 466], [742, 457], [1206, 681], [153, 697]])
 
 # Rellenar el polígono (rectángulo irregular) en la máscara
 cv2.fillPoly(mask, [puntos], 255)
