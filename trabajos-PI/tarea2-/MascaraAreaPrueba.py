@@ -32,7 +32,7 @@ mask = np.zeros(first_frame.shape[:2], dtype="uint8")
 # Define las coordenadas de las cuatro esquinas del rectángulo irregular
 # [x, y] = [columna, fila]
 #puntos = np.array([[481, 466], [742, 457], [226, 703], [1146, 668]])
-#correccion de puntos
+#correccion de puntos el orden es: superior izquierda, superior derecha, inferior derecha, inferior izquierda
 puntos = np.array([[481, 466], [742, 457], [1206, 681], [153, 697]])
 
 # Rellenar el polígono (rectángulo irregular) en la máscara
