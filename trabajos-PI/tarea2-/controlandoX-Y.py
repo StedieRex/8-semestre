@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 def compute_histogram(image_channel, bins=256):
     hist, _ = np.histogram(image_channel, bins=bins, range=(0, bins))
@@ -78,28 +78,40 @@ image_path = select_image()
 if not image_path:
     raise FileNotFoundError("No se seleccionó ninguna imagen")
 
-img = cv2.imread(image_path) 
+img = cv2.imread(image_path)
 if img is None:
     raise FileNotFoundError("La imagen no pudo ser cargada")
 
 # Crear una ventana para los sliders
 cv2.namedWindow('Ajuste de Histograma', cv2.WINDOW_NORMAL)
 
-# Crear sliders para ajustar los puntos en X e Y
-cv2.createTrackbar('P1_X', 'Ajuste de Histograma', 0, 255, update_histogram)
-cv2.createTrackbar('P2_X', 'Ajuste de Histograma', 32, 255, update_histogram)
-cv2.createTrackbar('P2_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
-cv2.createTrackbar('P3_X', 'Ajuste de Histograma', 64, 255, update_histogram)
-cv2.createTrackbar('P3_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
-cv2.createTrackbar('P4_X', 'Ajuste de Histograma', 96, 255, update_histogram)
-cv2.createTrackbar('P4_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
-cv2.createTrackbar('P5_X', 'Ajuste de Histograma', 128, 255, update_histogram)
-cv2.createTrackbar('P5_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
-cv2.createTrackbar('P6_X', 'Ajuste de Histograma', 160, 255, update_histogram)
-cv2.createTrackbar('P6_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
-cv2.createTrackbar('P7_X', 'Ajuste de Histograma', 192, 255, update_histogram)
-cv2.createTrackbar('P7_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
-cv2.createTrackbar('P8_Y', 'Ajuste de Histograma', 0, 100, update_histogram)
+# Valores predeterminados para los puntos de referencia
+default_points = {
+    'P1_X': 0,
+    'P2_X': 32, 'P2_Y': 25,
+    'P3_X': 64, 'P3_Y': 50,
+    'P4_X': 96, 'P4_Y': 75,
+    'P5_X': 128, 'P5_Y': 100,
+    'P6_X': 160, 'P6_Y': 75,
+    'P7_X': 192, 'P7_Y': 50,
+    'P8_Y': 25
+}
+
+# Crear sliders para ajustar los puntos en X e Y con valores predeterminados
+cv2.createTrackbar('P1_X', 'Ajuste de Histograma', default_points['P1_X'], 255, update_histogram)
+cv2.createTrackbar('P2_X', 'Ajuste de Histograma', default_points['P2_X'], 255, update_histogram)
+cv2.createTrackbar('P2_Y', 'Ajuste de Histograma', default_points['P2_Y'], 100, update_histogram)
+cv2.createTrackbar('P3_X', 'Ajuste de Histograma', default_points['P3_X'], 255, update_histogram)
+cv2.createTrackbar('P3_Y', 'Ajuste de Histograma', default_points['P3_Y'], 100, update_histogram)
+cv2.createTrackbar('P4_X', 'Ajuste de Histograma', default_points['P4_X'], 255, update_histogram)
+cv2.createTrackbar('P4_Y', 'Ajuste de Histograma', default_points['P4_Y'], 100, update_histogram)
+cv2.createTrackbar('P5_X', 'Ajuste de Histograma', default_points['P5_X'], 255, update_histogram)
+cv2.createTrackbar('P5_Y', 'Ajuste de Histograma', default_points['P5_Y'], 100, update_histogram)
+cv2.createTrackbar('P6_X', 'Ajuste de Histograma', default_points['P6_X'], 255, update_histogram)
+cv2.createTrackbar('P6_Y', 'Ajuste de Histograma', default_points['P6_Y'], 100, update_histogram)
+cv2.createTrackbar('P7_X', 'Ajuste de Histograma', default_points['P7_X'], 255, update_histogram)
+cv2.createTrackbar('P7_Y', 'Ajuste de Histograma', default_points['P7_Y'], 100, update_histogram)
+cv2.createTrackbar('P8_Y', 'Ajuste de Histograma', default_points['P8_Y'], 100, update_histogram)
 
 # Llamar una vez para inicializar la visualización
 update_histogram(0)
