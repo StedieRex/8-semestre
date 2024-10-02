@@ -73,21 +73,20 @@ img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 # Definir puntos de control de la distribución de referencia (L_R) con el doble de puntos
 reference_points = [
     (0, 0.0),
-    (32, 0.10),  
-    (64, 0.20),  
-    (96, 0.30),  
-    (128, 0.50),  
-    (160, 0.70),  
-    (192, 0.85),  
-    (220, 0.95),  
+    (12, 0.35),  
+    (34, 0.28),  
+    (51, 0.69),  
+    (78, 0.84),  
+    (140, 0.88),  
+    (242, 0.94),  
     (255, 1.0)
 ]
 
 # Aplicar la especificación del histograma
-result_image = apply_histogram_specification(img_rgb, reference_points)
+result_image = apply_histogram_specification(img, reference_points)
 
 # Mostrar ambas imágenes en una ventana
-combined_image = np.hstack((img_rgb, result_image))
+combined_image = np.hstack((img, result_image))
 cv2.imshow('Imagen Original y Procesada', combined_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
