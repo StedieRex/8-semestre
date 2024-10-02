@@ -63,13 +63,13 @@ def aplicar_normalizacion(frame):
     # Puntos de referencia para la especificación del histograma
     reference_points = [
         (0, 0.0),
-        (12, 0.35),  
-        (34, 0.28),  
-        (51, 0.69),  
-        (78, 0.84),  
-        (140, 0.88),  
-        (242, 0.94),  
-        (255, 1.0)
+        (20, 0.23),  
+        (89, 0.66),  
+        (96, 0.77),  
+        (148, 0.86),  
+        (180, 0.79),  
+        (237, 0.84),  
+        (255, 0.97)
     ]
     
     # Aplicar la especificación del histograma en el frame
@@ -115,7 +115,7 @@ def camara():
     threshold_iluminacion_alta = 0.7
     intervalo_histograma = 15
     frame_count = 0
-    velocidad = 15
+    velocidad = 5
 
     hist_list = []
     for i in range(5):
@@ -163,18 +163,22 @@ def camara():
             else:
                 aplicar_filtro = False
 
-        masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
+        #masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
 
         if aplicar_filtro:
-            masked_frame = aplicar_normalizacion(masked_frame)
+            frame = aplicar_normalizacion(frame)
+            masked_frame = frame
+            # masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
 
-            hsv = cv2.cvtColor(masked_frame, cv2.COLOR_BGR2HSV)
-            mascara_blanco = cv2.inRange(hsv, (h_min_blanco, s_min_blanco, v_min_blanco), (h_max_blanco, s_max_blanco, v_max_blanco))
-            mascara_amarillo = cv2.inRange(hsv, (h_min_amarillo, s_min_amarillo, v_min_amarillo), (h_max_amarillo, s_max_amarillo, v_max_amarillo))
-            mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
-            masked_frame = cv2.bitwise_and(masked_frame, masked_frame, mask=mascara)
-
+            # hsv = cv2.cvtColor(masked_frame, cv2.COLOR_BGR2HSV)
+            # mascara_blanco = cv2.inRange(hsv, (h_min_blanco, s_min_blanco, v_min_blanco), (h_max_blanco, s_max_blanco, v_max_blanco))
+            # mascara_amarillo = cv2.inRange(hsv, (h_min_amarillo, s_min_amarillo, v_min_amarillo), (h_max_amarillo, s_max_amarillo, v_max_amarillo))
+            # mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
+            # masked_frame = cv2.bitwise_and(masked_frame, masked_frame, mask=mascara)
+            
         else:
+            masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
+            
             #entre mas alto beta mas brillo, sus limites son 0 y 100, puede ser negativo
             #entre mas alto alpha mas contraste, sus limites son 0 y 3, puede ser negativo
             masked_frame = adjust_brightness_contrast(masked_frame, alpha=0.75, beta=45)
@@ -184,8 +188,7 @@ def camara():
             mascara_amarillo = cv2.inRange(hsv, (h_min_amarillo, s_min_amarillo, v_min_amarillo), (h_max_amarillo, s_max_amarillo, v_max_amarillo))
             mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
             masked_frame = cv2.bitwise_and(masked_frame, masked_frame, mask=mascara)
-
-
+            
         cv2.imshow('Masked Video', masked_frame)
         if cv2.waitKey(velocidad) & 0xFF == ord('q'):
             break
