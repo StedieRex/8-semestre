@@ -63,13 +63,13 @@ def aplicar_normalizacion(frame):
     # Puntos de referencia para la especificación del histograma
     reference_points = [
         (0, 0.0),
-        (20, 0.23),  
-        (89, 0.66),  
-        (96, 0.77),  
-        (148, 0.86),  
-        (180, 0.79),  
-        (237, 0.84),  
-        (255, 0.97)
+        (15, 0.57),  
+        (29, 0.64),  
+        (36, 0.77),  
+        (164, 0.78),  
+        (177, 0.78),  
+        (209, 0.91),  
+        (255, 1.0)
     ]
     
     # Aplicar la especificación del histograma en el frame
@@ -111,9 +111,8 @@ def camara():
         print("Error al abrir el video")
         exit()
 
-    threshold_iluminacion_baja = 0.3
-    threshold_iluminacion_alta = 0.7
-    intervalo_histograma = 15
+    threshold_iluminacion_baja = 0.2
+    intervalo_histograma = 5
     frame_count = 0
     velocidad = 5
 
@@ -153,22 +152,20 @@ def camara():
             hist_v = calcular_histograma_hsv(frame)
             iluminacion_actual_total = np.sum(hist_v)
             iluminacion_baja_val = np.sum(hist_v[:50]) / iluminacion_actual_total
-            iluminacion_alta_val = np.sum(hist_v[200:]) / iluminacion_actual_total
             diferencia_iluminacion = iluminacion_actual_total / iluminacion_referencia_total
 
-            if (iluminacion_baja_val > threshold_iluminacion_baja or
-                iluminacion_alta_val > threshold_iluminacion_alta or
-                diferencia_iluminacion < 0.55 or diferencia_iluminacion > 1):
+            if (iluminacion_baja_val > threshold_iluminacion_baja or diferencia_iluminacion < 0.55 ): # si la iluminacion es menor a 55% significa que esta muy oscuro
                 aplicar_filtro = True
             else:
                 aplicar_filtro = False
 
         #masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
-
+        aplicar_filtro = True
+        
         if aplicar_filtro:
             frame = aplicar_normalizacion(frame)
-            masked_frame = frame
-            # masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
+
+            masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
 
             # hsv = cv2.cvtColor(masked_frame, cv2.COLOR_BGR2HSV)
             # mascara_blanco = cv2.inRange(hsv, (h_min_blanco, s_min_blanco, v_min_blanco), (h_max_blanco, s_max_blanco, v_max_blanco))

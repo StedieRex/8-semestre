@@ -31,7 +31,7 @@ def histogram_specification(original_hist, reference_points, bins=256):
             a_prime = reference_points[n][0] + (b - reference_points[n][1]) * \
                       ((reference_points[n + 1][0] - reference_points[n][0]) / 
                       (reference_points[n + 1][1] - reference_points[n][1]))
-        f_hs[a] = np.clip(a_prime, 0, 255)  # Asegúrate de que el nuevo valor esté en el rango correcto
+        f_hs[a] = np.clip(a_prime, 0, 255)
 
     return f_hs
 
@@ -43,50 +43,70 @@ def apply_histogram_specification(image, reference_points, bins=256):
         original_hist = compute_histogram(channel, bins=bins)
         f_hs = histogram_specification(original_hist, reference_points, bins=bins)
         
-        # Remapear los valores del canal original usando f_hs
         new_channel = np.clip(np.interp(channel.flatten(), np.arange(bins), f_hs), 0, 255).reshape(channel.shape)
         result_channels.append(new_channel.astype(np.uint8))
     
-    result_image = cv2.merge(result_channels)
-    return result_image
+    masked_frame = cv2.merge(result_channels)
+    return masked_frame
 
-def select_image():
+def select_video():
     root = Tk()
     root.withdraw()
-    file_path = askopenfilename(filetypes=[("Image files", "*.jpg;*.jpeg;*.png;*.bmp;*.tiff")])
+    file_path = askopenfilename(filetypes=[("Video files", "*.mp4;*.avi;*.mov;*.mkv")])
     root.destroy()
     return file_path
 
-image_path = select_image()
+video_path = select_video()
 
-if not image_path:
-    raise FileNotFoundError("No se seleccionó ninguna imagen")
+if not video_path:
+    raise FileNotFoundError("No se seleccionó ningún video")
 
-# Cargar la imagen en BGR (OpenCV lo carga en BGR por defecto)
-img = cv2.imread(image_path)
-if img is None:
-    raise FileNotFoundError("La imagen no pudo ser cargada")
+cap = cv2.VideoCapture(video_path)
+if not cap.isOpened():
+    raise FileNotFoundError("El video no pudo ser cargado")
 
-# Convertir BGR a RGB para la visualización
-img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-# Definir puntos de control de la distribución de referencia (L_R) con el doble de puntos
 reference_points = [
     (0, 0.0),
-    (12, 0.35),  
-    (34, 0.28),  
-    (51, 0.69),  
-    (78, 0.84),  
-    (140, 0.88),  
-    (242, 0.94),  
+    (15, 0.57),  
+    (29, 0.64),  
+    (36, 0.77),  
+    (164, 0.78),  
+    (177, 0.78),  
+    (209, 0.91),  
     (255, 1.0)
 ]
 
-# Aplicar la especificación del histograma
-result_image = apply_histogram_specification(img, reference_points)
+h_min_blanco = 0
+h_max_blanco = 180
+s_min_blanco = 0
+s_max_blanco = 60
+v_min_blanco = 200
+v_max_blanco = 255
 
-# Mostrar ambas imágenes en una ventana
-combined_image = np.hstack((img, result_image))
-cv2.imshow('Imagen Original y Procesada', combined_image)
-cv2.waitKey(0)
+h_min_amarillo = 10
+h_max_amarillo = 30
+s_min_amarillo = 100
+s_max_amarillo = 255
+v_min_amarillo = 150
+v_max_amarillo = 255
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    masked_frame = apply_histogram_specification(frame, reference_points)
+
+    # hsv = cv2.cvtColor(masked_frame, cv2.COLOR_BGR2HSV)
+    # mascara_blanco = cv2.inRange(hsv, (h_min_blanco, s_min_blanco, v_min_blanco), (h_max_blanco, s_max_blanco, v_max_blanco))
+    # mascara_amarillo = cv2.inRange(hsv, (h_min_amarillo, s_min_amarillo, v_min_amarillo), (h_max_amarillo, s_max_amarillo, v_max_amarillo))
+    # mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
+    # masked_frame = cv2.bitwise_and(masked_frame, masked_frame, mask=mascara)
+
+    cv2.imshow('Video Original y Procesado', masked_frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
 cv2.destroyAllWindows()
