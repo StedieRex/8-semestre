@@ -17,10 +17,15 @@ def ajustar_gamma(imagen, gamma=1.0):
     return cv2.LUT(imagen, tabla)
 
 def adjust_brightness_contrast(image, alpha, beta):
+# Convertir la imagen a un array de NumPy
+    img_array = np.array(image, dtype=np.uint8)
     
-    contraste = alpha / 50.0  # Rango de contraste ajustado a 0.0 - 2.0
-    adjusted = cv2.convertScaleAbs(image, alpha=contraste, beta=beta)
-    return adjusted
+    # Aplicar la transformación de contraste a cada canal (R, G, B)
+    img_contraste = np.zeros_like(img_array)
+    for i in range(3):  # Para cada canal de color
+        img_contraste[..., i] = np.clip(alpha * img_array[..., i] + beta, 0, 255)
+    
+    return img_contraste.astype(np.uint8)
 
 def camara():
     # Rango para resaltar el color blanco y amarillo en HSV
@@ -82,22 +87,26 @@ def camara():
     # Rellenar el polígono (rectángulo irregular) en la máscara
     cv2.fillPoly(mask, [puntos], 255)
 
+    # Ajustar brillo y contraste
+    gamma = 56.0/ 100.0 + 0.1  # Rango de gamma ajustado a 0.1 - 1.1
+    alpha = 88.0 / 50.0  # Rango de contraste ajustado a 0.0 - 2.0
+    beta = 1.0 # Rango de contraste ajustado a 0.0 - 2.0
+
     # Leer los primeros 5 frames para calcular el histograma promedio de referencia
     hist_list = []
     for i in range(5):
         ret, frame = capture.read()
+        mascara_delimitadora = cv2.bitwise_and(frame, frame, mask=mask)
+        ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta)
+
         if not ret:
             print("Error al leer los primeros frames")
             capture.release()
             exit()
         
         # Calcular histograma del canal V de cada frame y añadirlo a la lista
-        hist_v = calcular_histograma_hsv(frame)
+        hist_v = calcular_histograma_hsv(mascara_delimitadora)
         hist_list.append(hist_v)
-
-    # Ajustar brillo y contraste
-    gamma = 56.0/ 100.0 + 0.1  # Rango de gamma ajustado a 0.1 - 1.1
-    alpha = 88.0
     
     frame_count = 0
     intervalo_histograma = 1  # Cada 15 frames
@@ -108,37 +117,21 @@ def camara():
     # Promediar los histogramas de los primeros 5 frames para obtener el histograma de referencia
     histograma_referencia = promedio_histogramas(hist_list)
     iluminacion_referencia_total = np.sum(histograma_referencia)
+    print("Histograma de referencia: ", iluminacion_referencia_total)
     
     aplicar_filtro = False
     
     while capture.isOpened():
         ret, frame = capture.read()
+        mascara_delimitadora = cv2.bitwise_and(frame, frame, mask=mask)
+
         if ret:
             frame_count += 1
-            # Cada 15 frames, calcular el histograma HSV y compararlo con el de referencia
-            if frame_count % intervalo_histograma == 0:
-                    hist_v = calcular_histograma_hsv(frame)
-                    iluminacion_actual_total = np.sum(hist_v)
-                    iluminacion_baja_val = np.sum(hist_v[:50]) / iluminacion_actual_total  # Proporción de píxeles con poca luz
-                    iluminacion_alta_val = np.sum(hist_v[200:]) / iluminacion_actual_total  # Proporción de píxeles con demasiada luz
-                    
-                    # Detectar si la iluminación es demasiado baja o alta en comparación con el promedio de referencia
-                    diferencia_iluminacion = iluminacion_actual_total / iluminacion_referencia_total
-
-                    #comparacion para iluminacion alto
-                    if iluminacion_alta_val > threshold_iluminacion_alta:
-                        aplicar_filtro = True
-                        print("Iluminación alta")
-                    else:
-                        aplicar_filtro = False
-                        print("Iluminación normal")
             
             if not aplicar_filtro:
-                # Aplicar la máscara delimitadora de la carretera
-                mascara_delimitadora = cv2.bitwise_and(frame, frame, mask=mask)
                 
                 # Ajustar brillo y contraste en las áreas resaltadas
-                ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta=0)
+                ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta)
                 ajuste_fin = ajustar_gamma(ajuste_contraste, gamma)
                 
                 # Convertir a espacio de color HSV
@@ -153,10 +146,7 @@ def camara():
                 # Combinar ambas máscaras (blanco y amarillo)
                 mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
                 frame_final = cv2.bitwise_and(ajuste_fin, ajuste_fin, mask=mascara)
-            else:
-                # Aplicar la máscara delimitadora de la carretera
-                mascara_delimitadora = cv2.bitwise_and(frame, frame, mask=mask)
-                
+            else:                
                 # Convertir a espacio de color HSV
                 hsv = cv2.cvtColor(mascara_delimitadora, cv2.COLOR_BGR2HSV)
 
@@ -170,6 +160,22 @@ def camara():
                 mascara = cv2.bitwise_or(mascara_blanco, mascara_amarillo)
                 frame_final = cv2.bitwise_and(mascara_delimitadora, mascara_delimitadora, mask=mascara)                
 
+            # Cada 15 frames, calcular el histograma HSV y compararlo con el de referencia
+            if frame_count % intervalo_histograma == 0:
+                    hist_v = calcular_histograma_hsv(frame_final)
+                    iluminacion_actual_total = np.sum(hist_v)
+                    iluminacion_alta_val = np.sum(hist_v[200:]) / iluminacion_actual_total  # Proporción de píxeles con demasiada luz
+                    
+                    # Detectar si la iluminación es demasiado baja o alta en comparación con el promedio de referencia
+                    diferencia_iluminacion = iluminacion_actual_total / iluminacion_referencia_total
+                    print("valores de iluminacion alta: ", (iluminacion_alta_val*100))
+                    #comparacion para iluminacion alto
+                    if iluminacion_alta_val > threshold_iluminacion_alta:
+                        aplicar_filtro = True
+                        #print("Iluminación alta")
+                    else:
+                        aplicar_filtro = False
+                        #print("Iluminación normal")
             # Mostrar la imagen enmascarada y el video original
             cv2.imshow('Original', frame)
             cv2.imshow('Resaltado Blanco y Amarillo', frame_final)
