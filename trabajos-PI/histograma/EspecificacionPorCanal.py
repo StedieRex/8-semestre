@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+from tkinter import Tk, Toplevel, Scale, HORIZONTAL, VERTICAL, Frame, Scrollbar, Canvas
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 def compute_histogram(image_channel, bins=256):
     hist, _ = np.histogram(image_channel, bins=bins, range=(0, bins))
@@ -56,46 +56,43 @@ def select_image():
     root.destroy()
     return file_path
 
-def update_histogram(val):
-    # Referencia por cada canal (R, G, B)
+def update_histogram(val=None):
     reference_points_r = [
-        (cv2.getTrackbarPos('R_P1_X', 'Ajuste de Histograma'), 0.0),
-        (cv2.getTrackbarPos('R_P2_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('R_P2_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('R_P3_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('R_P3_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('R_P4_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('R_P4_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('R_P5_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('R_P5_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('R_P6_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('R_P6_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('R_P7_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('R_P7_Y', 'Ajuste de Histograma') / 100),
-        (255, cv2.getTrackbarPos('R_P8_Y', 'Ajuste de Histograma') / 100)
+        (red_sliders[0].get(), 0.0),
+        (red_sliders[1].get(), red_sliders[2].get() / 100),
+        (red_sliders[3].get(), red_sliders[4].get() / 100),
+        (red_sliders[5].get(), red_sliders[6].get() / 100),
+        (red_sliders[7].get(), red_sliders[8].get() / 100),
+        (red_sliders[9].get(), red_sliders[10].get() / 100),
+        (red_sliders[11].get(), red_sliders[12].get() / 100),
+        (255, red_sliders[13].get() / 100)
     ]
 
     reference_points_g = [
-        (cv2.getTrackbarPos('G_P1_X', 'Ajuste de Histograma'), 0.0),
-        (cv2.getTrackbarPos('G_P2_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('G_P2_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('G_P3_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('G_P3_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('G_P4_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('G_P4_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('G_P5_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('G_P5_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('G_P6_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('G_P6_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('G_P7_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('G_P7_Y', 'Ajuste de Histograma') / 100),
-        (255, cv2.getTrackbarPos('G_P8_Y', 'Ajuste de Histograma') / 100)
+        (green_sliders[0].get(), 0.0),
+        (green_sliders[1].get(), green_sliders[2].get() / 100),
+        (green_sliders[3].get(), green_sliders[4].get() / 100),
+        (green_sliders[5].get(), green_sliders[6].get() / 100),
+        (green_sliders[7].get(), green_sliders[8].get() / 100),
+        (green_sliders[9].get(), green_sliders[10].get() / 100),
+        (green_sliders[11].get(), green_sliders[12].get() / 100),
+        (255, green_sliders[13].get() / 100)
     ]
 
     reference_points_b = [
-        (cv2.getTrackbarPos('B_P1_X', 'Ajuste de Histograma'), 0.0),
-        (cv2.getTrackbarPos('B_P2_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('B_P2_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('B_P3_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('B_P3_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('B_P4_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('B_P4_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('B_P5_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('B_P5_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('B_P6_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('B_P6_Y', 'Ajuste de Histograma') / 100),
-        (cv2.getTrackbarPos('B_P7_X', 'Ajuste de Histograma'), cv2.getTrackbarPos('B_P7_Y', 'Ajuste de Histograma') / 100),
-        (255, cv2.getTrackbarPos('B_P8_Y', 'Ajuste de Histograma') / 100)
+        (blue_sliders[0].get(), 0.0),
+        (blue_sliders[1].get(), blue_sliders[2].get() / 100),
+        (blue_sliders[3].get(), blue_sliders[4].get() / 100),
+        (blue_sliders[5].get(), blue_sliders[6].get() / 100),
+        (blue_sliders[7].get(), blue_sliders[8].get() / 100),
+        (blue_sliders[9].get(), blue_sliders[10].get() / 100),
+        (blue_sliders[11].get(), blue_sliders[12].get() / 100),
+        (255, blue_sliders[13].get() / 100)
     ]
 
-    # Ajustar imagen con las referencias de cada canal (R, G, B)
     reference_points = [reference_points_b, reference_points_g, reference_points_r]
     adjusted_image = apply_histogram_specification(img, reference_points)
 
-    # Mostrar la imagen original y ajustada lado a lado
     combined_image = np.hstack((img, adjusted_image))
     cv2.imshow('Ajuste de Histograma', combined_image)
 
@@ -108,32 +105,56 @@ img = cv2.imread(image_path)
 if img is None:
     raise FileNotFoundError("La imagen no pudo ser cargada")
 
-# Crear una ventana para los sliders
+# Crear la ventana de Tkinter para los sliders
+root = Tk()
+root.title("Control de Sliders")
+
+# Crear un frame con scrollbar para contener los sliders
+container = Frame(root)
+canvas = Canvas(container)
+scrollbar = Scrollbar(container, orient="vertical", command=canvas.yview)
+scrollable_frame = Frame(canvas)
+
+scrollable_frame.bind(
+    "<Configure>",
+    lambda e: canvas.configure(
+        scrollregion=canvas.bbox("all")
+    )
+)
+
+canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+canvas.configure(yscrollcommand=scrollbar.set)
+
+# Empaquetar el frame con el scrollbar
+container.pack(fill="both", expand=True)
+canvas.pack(side="left", fill="both", expand=True)
+scrollbar.pack(side="right", fill="y")
+
+# Crear sliders para cada canal
+def create_sliders(parent, label):
+    sliders = []
+    for i in range(1, 9):
+        sliders.append(Scale(parent, from_=0, to=255, orient=HORIZONTAL, label=f'{label}_P{i}_X'))
+        sliders[-1].pack()
+        sliders.append(Scale(parent, from_=0, to=100, orient=HORIZONTAL, label=f'{label}_P{i}_Y'))
+        sliders[-1].pack()
+    return sliders
+
+# Crear sliders para cada canal y empaquetarlos
+red_sliders = create_sliders(scrollable_frame, "R")
+green_sliders = create_sliders(scrollable_frame, "G")
+blue_sliders = create_sliders(scrollable_frame, "B")
+
+# Mostrar la ventana de OpenCV con la imagen
 cv2.namedWindow('Ajuste de Histograma', cv2.WINDOW_NORMAL)
+update_histogram()
 
-# Crear sliders para ajustar los puntos en X e Y de cada canal (R, G, B)
-for channel in ['R', 'G', 'B']:
-    cv2.createTrackbar(f'{channel}_P1_X', 'Ajuste de Histograma', 0, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P2_X', 'Ajuste de Histograma', 32, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P2_Y', 'Ajuste de Histograma', 25, 100, update_histogram)
-    cv2.createTrackbar(f'{channel}_P3_X', 'Ajuste de Histograma', 64, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P3_Y', 'Ajuste de Histograma', 50, 100, update_histogram)
-    cv2.createTrackbar(f'{channel}_P4_X', 'Ajuste de Histograma', 96, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P4_Y', 'Ajuste de Histograma', 75, 100, update_histogram)
-    cv2.createTrackbar(f'{channel}_P5_X', 'Ajuste de Histograma', 128, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P5_Y', 'Ajuste de Histograma', 100, 100, update_histogram)
-    cv2.createTrackbar(f'{channel}_P6_X', 'Ajuste de Histograma', 160, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P6_Y', 'Ajuste de Histograma', 75, 100, update_histogram)
-    cv2.createTrackbar(f'{channel}_P7_X', 'Ajuste de Histograma', 192, 255, update_histogram)
-    cv2.createTrackbar(f'{channel}_P7_Y', 'Ajuste de Histograma', 50, 100, update_histogram)
-    cv2.createTrackbar(f'{channel}_P8_Y', 'Ajuste de Histograma', 25, 100, update_histogram)
+# Conectar los sliders con la función de actualización
+for slider in red_sliders + green_sliders + blue_sliders:
+    slider.config(command=update_histogram)
 
-# Llamar una vez para inicializar la visualización
-update_histogram(0)
+# Ejecutar el loop de Tkinter
+root.mainloop()
 
-# Mantener la ventana abierta hasta que se presione la tecla 'q'
-while True:
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
+# Cerrar OpenCV cuando se cierre la ventana de Tkinter
 cv2.destroyAllWindows()
