@@ -160,7 +160,7 @@ def camara():
                 aplicar_filtro = False
 
         #masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
-        aplicar_filtro = True
+        aplicar_filtro = False
         
         if aplicar_filtro:
             frame = aplicar_normalizacion(frame)
