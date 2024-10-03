@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
-from tkinter import Tk, Toplevel, Scale, HORIZONTAL, VERTICAL, Frame, Scrollbar, Canvas
+from tkinter import Tk, Toplevel, Scale, HORIZONTAL, VERTICAL, Frame, Scrollbar, Canvas, Button
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+import json
 
 def compute_histogram(image_channel, bins=256):
     hist, _ = np.histogram(image_channel, bins=bins, range=(0, bins))
@@ -56,7 +57,37 @@ def select_image():
     root.destroy()
     return file_path
 
+def save_image():
+    save_path = asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("BMP files", "*.bmp"), ("All files", "*.*")])
+    if save_path:
+        cv2.imwrite(save_path, adjusted_image)
+
+def save_config():
+    config = {
+        "red": [slider.get() for slider in red_sliders],
+        "green": [slider.get() for slider in green_sliders],
+        "blue": [slider.get() for slider in blue_sliders]
+    }
+    save_path = asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+    if save_path:
+        with open(save_path, 'w') as config_file:
+            json.dump(config, config_file)
+
+def load_config():
+    config_path = askopenfilename(filetypes=[("JSON files", "*.json")])
+    if config_path:
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+            for i, slider in enumerate(red_sliders):
+                slider.set(config["red"][i])
+            for i, slider in enumerate(green_sliders):
+                slider.set(config["green"][i])
+            for i, slider in enumerate(blue_sliders):
+                slider.set(config["blue"][i])
+        update_histogram()
+
 def update_histogram(val=None):
+    global adjusted_image
     reference_points_r = [
         (red_sliders[0].get(), 0.0),
         (red_sliders[1].get(), red_sliders[2].get() / 100),
@@ -144,6 +175,14 @@ def create_sliders(parent, label):
 red_sliders = create_sliders(scrollable_frame, "R")
 green_sliders = create_sliders(scrollable_frame, "G")
 blue_sliders = create_sliders(scrollable_frame, "B")
+
+# Añadir botones para guardar y cargar configuración y guardar la imagen ajustada
+button_frame = Frame(root)
+button_frame.pack(fill="x", padx=5, pady=5)
+
+Button(button_frame, text="Guardar Imagen", command=save_image).pack(side="left", padx=5)
+Button(button_frame, text="Guardar Configuración", command=save_config).pack(side="left", padx=5)
+Button(button_frame, text="Cargar Configuración", command=load_config).pack(side="left", padx=5)
 
 # Mostrar la ventana de OpenCV con la imagen
 cv2.namedWindow('Ajuste de Histograma', cv2.WINDOW_NORMAL)
