@@ -112,7 +112,7 @@ def camara():
     intervalo_histograma = 1  # Cada 15 frames
     # Variables para controlar el estado de normalización
     threshold_iluminacion_baja = 0.3  # Umbral para detectar poca luz, entre mas bajo mas oscuro
-    threshold_iluminacion_alta = 0.18  # Umbral para detectar demasiada luz, entre mas alto mas oscuro
+    threshold_iluminacion_alta = 3  # Umbral para detectar demasiada luz, entre mas alto mas oscuro
 
     # Promediar los histogramas de los primeros 5 frames para obtener el histograma de referencia
     histograma_referencia = promedio_histogramas(hist_list)
@@ -162,15 +162,20 @@ def camara():
 
             # Cada 15 frames, calcular el histograma HSV y compararlo con el de referencia
             if frame_count % intervalo_histograma == 0:
-                    hist_v = calcular_histograma_hsv(frame_final)
+                    # Ajustar brillo y contraste en las áreas resaltadas
+                    if aplicar_filtro:
+                        ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta)
+                        ajuste_fin = ajustar_gamma(ajuste_contraste, gamma)
+                        
+                    hist_v = calcular_histograma_hsv(ajuste_fin)
                     iluminacion_actual_total = np.sum(hist_v)
                     iluminacion_alta_val = np.sum(hist_v[200:]) / iluminacion_actual_total  # Proporción de píxeles con demasiada luz
                     
                     # Detectar si la iluminación es demasiado baja o alta en comparación con el promedio de referencia
-                    diferencia_iluminacion = iluminacion_actual_total / iluminacion_referencia_total
-                    print("valores de iluminacion alta: ", (iluminacion_alta_val*100))
+                    comp=(iluminacion_alta_val*100)
+                    #print("valores de iluminacion alta: ", comp)
                     #comparacion para iluminacion alto
-                    if iluminacion_alta_val > threshold_iluminacion_alta:
+                    if comp > threshold_iluminacion_alta:
                         aplicar_filtro = True
                         #print("Iluminación alta")
                     else:
