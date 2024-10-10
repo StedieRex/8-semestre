@@ -22,9 +22,10 @@ def actualizar_imagen(_):
     value_min = cv2.getTrackbarPos('Value Min', 'Ajustes HSV')
     value_max = cv2.getTrackbarPos('Value Max', 'Ajustes HSV')
 
-    # Obtener los valores de los sliders de contraste y gamma
+    # Obtener los valores de los sliders de contraste, gamma y brillo
     contraste = cv2.getTrackbarPos('Contraste', 'Ajustes HSV') / 50.0  # Rango de contraste ajustado a 0.0 - 2.0
     gamma = cv2.getTrackbarPos('Gamma', 'Ajustes HSV') / 100.0 + 0.1  # Rango de gamma ajustado a 0.1 - 1.1
+    brillo = cv2.getTrackbarPos('Brillo', 'Ajustes HSV') - 100  # Rango de brillo ajustado a -100 a 100
 
     # Crear una máscara basada en el rango HSV
     lower_bound = np.array([hue_min, saturation_min, value_min])
@@ -35,7 +36,7 @@ def actualizar_imagen(_):
     imagen_resultado = cv2.bitwise_and(imagen, imagen, mask=mascara)
 
     # Ajustar el contraste
-    imagen_resultado = cv2.convertScaleAbs(imagen_resultado, alpha=contraste, beta=0)
+    imagen_resultado = cv2.convertScaleAbs(imagen_resultado, alpha=contraste, beta=brillo)
 
     # Aplicar corrección gamma
     imagen_resultado = ajustar_gamma(imagen_resultado, gamma)
@@ -67,6 +68,7 @@ def guardar_configuracion():
         'value_max': cv2.getTrackbarPos('Value Max', 'Ajustes HSV'),
         'contraste': cv2.getTrackbarPos('Contraste', 'Ajustes HSV'),
         'gamma': cv2.getTrackbarPos('Gamma', 'Ajustes HSV'),
+        'brillo': cv2.getTrackbarPos('Brillo', 'Ajustes HSV'),
         'ancho': cv2.getTrackbarPos('Ancho', 'Ajustes HSV'),
         'alto': cv2.getTrackbarPos('Alto', 'Ajustes HSV')
     }
@@ -97,6 +99,7 @@ def cargar_configuracion():
         cv2.setTrackbarPos('Value Max', 'Ajustes HSV', config['value_max'])
         cv2.setTrackbarPos('Contraste', 'Ajustes HSV', config['contraste'])
         cv2.setTrackbarPos('Gamma', 'Ajustes HSV', config['gamma'])
+        cv2.setTrackbarPos('Brillo', 'Ajustes HSV', config['brillo'])
         cv2.setTrackbarPos('Ancho', 'Ajustes HSV', config['ancho'])
         cv2.setTrackbarPos('Alto', 'Ajustes HSV', config['alto'])
 
@@ -123,29 +126,26 @@ if ruta_imagen:
     cv2.createTrackbar('Value Min', 'Ajustes HSV', 0, 255, actualizar_imagen)  # Value Mínimo entre 0 y 255
     cv2.createTrackbar('Value Max', 'Ajustes HSV', 255, 255, actualizar_imagen)  # Value Máximo entre 0 y 255
 
-    # Crear sliders para ajustar contraste y gamma
+    # Crear sliders para ajustar contraste, gamma y brillo
     cv2.createTrackbar('Contraste', 'Ajustes HSV', 50, 100, actualizar_imagen)  # Contraste entre 0.0 y 2.0 (multiplicador)
     cv2.createTrackbar('Gamma', 'Ajustes HSV', 10, 100, actualizar_imagen)  # Gamma entre 0.1 y 1.1
+    cv2.createTrackbar('Brillo', 'Ajustes HSV', 100, 200, actualizar_imagen)  # Brillo entre -100 y 100
 
     # Crear sliders para ajustar el tamaño de la ventana
     cv2.createTrackbar('Ancho', 'Ajustes HSV', 640, 1920, actualizar_imagen)  # Ancho máximo 1920
     cv2.createTrackbar('Alto', 'Ajustes HSV', 480, 1080, actualizar_imagen)  # Alto máximo 1080
 
-    # Mostrar la imagen original para referencia
-    cv2.imshow('Imagen Original', imagen)
+    # Mostrar la imagen original
+    cv2.imshow('Imagen Modificada', imagen)
 
-    # Botones para guardar y cargar configuración
     while True:
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('g'):
-            guardar_configuracion()  # Guardar configuración al presionar 'g'
-        elif key == ord('l'):
-            cargar_configuracion()  # Cargar configuración al presionar 'l'
-        elif key == 27:  # Salir con la tecla 'Esc'
+        tecla = cv2.waitKey(1) & 0xFF
+        if tecla == ord('g'):
+            guardar_configuracion()
+        elif tecla == ord('l'):
+            cargar_configuracion()
+        elif tecla == 27:  # ESC
             break
 
-    # Cerrar todas las ventanas al salir
-    cv2.destroyAllWindows()
-
-else:
-    print("No se seleccionó ninguna imagen.")
+cv2.destroyAllWindows()
+ 

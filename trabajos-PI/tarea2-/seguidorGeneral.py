@@ -16,7 +16,7 @@ def ajustar_gamma(imagen, gamma=1.0):
     tabla = np.array([((i / 255.0) ** (1.0 / gamma)) * 255 for i in np.arange(256)]).astype("uint8")
     return cv2.LUT(imagen, tabla)
 
-def adjust_brightness_contrast(image, alpha, beta):
+def contras_brillo(image, alpha, beta):
 # Convertir la imagen a un array de NumPy
     img_array = np.array(image, dtype=np.uint8)
     
@@ -97,7 +97,7 @@ def camara():
     for i in range(5):
         ret, frame = capture.read()
         mascara_delimitadora = cv2.bitwise_and(frame, frame, mask=mask)
-        ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta)
+        ajuste_contraste = contras_brillo(mascara_delimitadora, alpha, beta)
 
         if not ret:
             print("Error al leer los primeros frames")
@@ -111,7 +111,6 @@ def camara():
     frame_count = 0
     intervalo_histograma = 1  # Cada 15 frames
     # Variables para controlar el estado de normalización
-    threshold_iluminacion_baja = 0.3  # Umbral para detectar poca luz, entre mas bajo mas oscuro
     threshold_iluminacion_alta = 3  # Umbral para detectar demasiada luz, entre mas alto mas oscuro
 
     # Promediar los histogramas de los primeros 5 frames para obtener el histograma de referencia
@@ -131,7 +130,7 @@ def camara():
             if not aplicar_filtro:
                 
                 # Ajustar brillo y contraste en las áreas resaltadas
-                ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta)
+                ajuste_contraste = contras_brillo(mascara_delimitadora, alpha, beta)
                 ajuste_fin = ajustar_gamma(ajuste_contraste, gamma)
                 
                 # Convertir a espacio de color HSV
@@ -164,7 +163,7 @@ def camara():
             if frame_count % intervalo_histograma == 0:
                     # Ajustar brillo y contraste en las áreas resaltadas
                     if aplicar_filtro:
-                        ajuste_contraste = adjust_brightness_contrast(mascara_delimitadora, alpha, beta)
+                        ajuste_contraste = contras_brillo(mascara_delimitadora, alpha, beta)
                         ajuste_fin = ajustar_gamma(ajuste_contraste, gamma)
                         
                     hist_v = calcular_histograma_hsv(ajuste_fin)
