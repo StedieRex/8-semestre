@@ -1,5 +1,5 @@
 public class Cifrado implements java.io.Serializable{
-    private final String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 áéíóú";
+    private final String alfabeto = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789áéíóú";
     private int busca_posicion(char letra){
         int i=0;
         boolean encontrado = false;
