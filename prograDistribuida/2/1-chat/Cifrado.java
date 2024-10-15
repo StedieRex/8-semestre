@@ -1,5 +1,6 @@
 public class Cifrado implements java.io.Serializable{
-    private final String alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 áéíóú";
+    // el espacio estaba en los acentos pero se paso al inicio del alfaberto
+    private final String alfabeto = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789áéíóú";
     private int busca_posicion(char letra){
         int i=0;
         boolean encontrado = false;
