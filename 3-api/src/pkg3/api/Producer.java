@@ -1,21 +1,23 @@
-import javax.jms.*;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import javax.jms.*;
+
 public class Producer {
+
     public static void main(String[] args) {
         try {
-            // Crear conexión[^1^][1]
-            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+            // Crear conexión con ActiveMQ
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
             Connection connection = connectionFactory.createConnection();
             connection.start();
 
             // Crear sesión
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = session.createQueue("TestQueue");
+            Queue queue = session.createQueue("testQueue");
 
-            // Crear productor[^12^][12]
-            MessageProducer producer = session.createProducer(destination);
-            TextMessage message = session.createTextMessage("Hola desde el productor!");
+            // Crear productor y enviar un mensaje
+            MessageProducer producer = session.createProducer(queue);
+            TextMessage message = session.createTextMessage("Hola, este es un mensaje simple.");
             producer.send(message);
             System.out.println("Mensaje enviado: " + message.getText());
 
@@ -23,6 +25,7 @@ public class Producer {
             producer.close();
             session.close();
             connection.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
