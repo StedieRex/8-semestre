@@ -4,7 +4,7 @@ public class Main {
         Thread productor = new Thread(()->
         {
             for (int i = 0; i < 5; i++) {
-                cola.put("Mensaje " + i+1);
+                cola.put("Mensaje " + (i+1));
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {

@@ -1,0 +1,12 @@
+<dependencies>
+  <dependency>
+    <groupId>org.apache.activemq</groupId>
+    <artifactId>activemq-spring-boot-starter</artifactId>
+    <version>5.17.0</version>
+  </dependency>
+  <dependency>
+    <groupId>javax.jms</groupId>
+    <artifactId>javax.jms-api</artifactId>
+    <version>2.0.1</version>
+  </dependency>
+</dependencies>
