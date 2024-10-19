@@ -1,4 +1,4 @@
-package src.example.api;
+package com.example;
 import javax.jms.Connection;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
