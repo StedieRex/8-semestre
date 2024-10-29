@@ -21,7 +21,7 @@ if blurtype == 0:
     plt.imshow(cv2.blur(image,(size,size)))
 elif blurtype == 1:
     plt.figure(num="gausian blurring")
-    plt.imshow(cv2.GaussianBlur[image,(size,size),0])
+    plt.imshow(cv2.GaussianBlur(image,(size,size),0))
 elif blurtype == 2:
     plt.figure(num="median Blurring")
     plt.imshow(cv2.medianBlur(image,size))

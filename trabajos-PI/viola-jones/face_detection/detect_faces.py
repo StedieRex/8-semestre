@@ -6,6 +6,8 @@ from facedetector.facedetector import FaceDetector
 import argparse
 import cv2
 
+size = 5
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--face", required = True,
@@ -17,6 +19,10 @@ args = vars(ap.parse_args())
 # load the image and convert it to grayscale
 image = cv2.imread(args["image"])
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+gray=cv2.GaussianBlur(gray,(size,size),0)
+
+cv2.imshow("Imagen en gris",gray)
 
 # find faces in the image
 fd = FaceDetector(args["face"])
