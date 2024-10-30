@@ -39,7 +39,7 @@ while True:
 		break
 
 	# resize the frame and convert it to grayscale
-	frame = imutils.resize(frame, width = 300)
+	frame = imutils.resize(frame, width = 700)
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 	# detect faces in the image and then clone the frame
@@ -65,9 +65,6 @@ while True:
 
 	# show our enhanced detected faces
 	cv2.imshow("Enhanced Face", frameClone)
-
-	# show our detected faces
-	cv2.imshow("Face", frame)
 
 	# if the 'q' key is pressed, stop the loop
 	if cv2.waitKey(1) & 0xFF == ord("q"):
