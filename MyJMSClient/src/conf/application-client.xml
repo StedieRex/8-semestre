@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application-client version="9" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/application-client_9.xsd">
+  <display-name>MyJMSClient</display-name>
+</application-client>
