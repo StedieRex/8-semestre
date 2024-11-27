@@ -31,15 +31,14 @@ def dividir_archivos(carpeta):
 
         # Calcular cantidades
         total_archivos = len(archivos)
-        num_carpeta1 = math.floor(total_archivos * 0.8)
-        num_restantes = total_archivos - num_carpeta1
-        num_carpeta2 = math.floor(num_restantes * 0.9)
-        num_carpeta3 = num_restantes - num_carpeta2
+        num_carpeta1 = math.floor(total_archivos * 0.7)
+        num_carpeta2 = math.floor(total_archivos * 0.15)
+        num_carpeta3 = total_archivos - num_carpeta1 - num_carpeta2  # El resto para la carpeta 3
 
         print(f"\nDistribución de archivos:")
-        print(f"80% -> {num_carpeta1} archivos para carpeta 1")
-        print(f"90% del 20% restante -> {num_carpeta2} archivos para carpeta 2")
-        print(f"10% del 20% restante -> {num_carpeta3} archivos para carpeta 3")
+        print(f"70% -> {num_carpeta1} archivos para carpeta 1")
+        print(f"15% -> {num_carpeta2} archivos para carpeta 2")
+        print(f"15% -> {num_carpeta3} archivos para carpeta 3")
 
         # Crear carpetas
         carpeta1 = os.path.join(carpeta, os.path.basename(carpeta) + "1")

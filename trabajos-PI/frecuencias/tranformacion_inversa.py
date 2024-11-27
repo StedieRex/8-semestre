@@ -1,17 +1,26 @@
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
-import argparse
-import os
+import cv2 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import tkinter as tk 
+from tkinter import filedialog 
+from PIL import Image, ImageTk 
 
-#seleccionar la imagen con ventanas
-def select_image():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=True, help="Path to the image")
-    args = vars(ap.parse_args())
-    return args["image"]
+# Crear ventana oculta para usar el diálogo 
+root = tk.Tk() 
+root.withdraw() # Oculta la ventana principal 
 
-img = cv2.imread(select_image(), cv2.IMREAD_GRAYSCALE)
+# Abrir el diálogo para seleccionar múltiples imágenes 
+archivos_seleccionados = filedialog.askopenfilenames(title="Seleccionar imágenes", filetypes=[("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.gif;*.bmp")]) 
+if archivos_seleccionados: 
+    for archivo in archivos_seleccionados: 
+        print(f"Archivo seleccionado: {archivo}") 
+        ruta_imagen = archivo 
+else: 
+    print("No se seleccionó ningún archivo.") 
+    
+# Abrir la imagen y convertirla a escala de grises 
+img = cv2.imread( ruta_imagen, cv2.IMREAD_GRAYSCALE)
+img = cv2.resize(img, (400, 400))
 
 #aplicar la transformada de fourier
 dft = cv2.dft(np.float32(img), flags=cv2.DFT_COMPLEX_OUTPUT)
@@ -23,7 +32,7 @@ magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, 
 # crear un filtro  pasa-bajas (bloquear altas frecuencias)
 rows, cols = img.shape
 crow, ccol = rows // 2, cols // 2
-mask = np.ones((rows, cols, 2), np.uint8)
+mask = np.zeros((rows, cols, 2), np.uint8)
 r = 30 # radio del circulo
 center = [crow, ccol]
 x, y = np.ogrid[:rows, :cols]
