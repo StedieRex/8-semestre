@@ -20,7 +20,7 @@ else:
     
 # Abrir la imagen y convertirla a escala de grises 
 img = cv2.imread( ruta_imagen, cv2.IMREAD_GRAYSCALE)
-img = cv2.resize(img, (400, 400))
+img = cv2.resize(img, (150, 150))
 
 #aplicar la transformada de fourier
 dft = cv2.dft(np.float32(img), flags=cv2.DFT_COMPLEX_OUTPUT)
@@ -33,7 +33,7 @@ magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, 
 rows, cols = img.shape
 crow, ccol = rows // 2, cols // 2
 mask = np.zeros((rows, cols, 2), np.uint8)
-r = 30 # radio del circulo
+r = 20 # radio del circulo
 center = [crow, ccol]
 x, y = np.ogrid[:rows, :cols]
 mask_area = (x - center[0]) ** 2 + (y - center[1]) ** 2 <= r*r
@@ -44,6 +44,10 @@ fshift = dft_shift * mask
 f_ishift = np.fft.ifftshift(fshift)
 img_back = cv2.idft(f_ishift)
 img_back = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+
+#aplicando filtro gaussiano
+img_back = cv2.GaussianBlur(img_back, (11, 11), 0)# parametros: imagen, tamaño del kernel, desviación estandar
+
 
 # Visualizar la imagen original y la imagen filtrada
 plt.figure(figsize=(12, 6))
