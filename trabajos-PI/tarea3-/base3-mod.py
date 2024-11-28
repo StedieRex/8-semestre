@@ -129,9 +129,18 @@ model.compile(optimizer='adam',
 model.summary()
 
 epochs = 3
-history = model.fit(train_data_gen, steps_per_epoch=total_train // BATCH_SIZE, 
+
+def infinite_generator(generator):
+    while True:
+        for batch in generator:
+            yield batch
+
+train_data_gen_inf = infinite_generator(train_data_gen)
+val_data_gen_inf = infinite_generator(val_data_gen)
+
+history = model.fit(train_data_gen_inf, steps_per_epoch=total_train // BATCH_SIZE, 
                     epochs=epochs,
-                    validation_data=val_data_gen,
+                    validation_data=val_data_gen_inf,
                     validation_steps=total_validation // BATCH_SIZE)
 
 acc = history.history['accuracy']
