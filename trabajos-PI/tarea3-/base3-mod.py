@@ -128,8 +128,7 @@ model.compile(optimizer='adam',
 
 model.summary()
 
-epochs = 3
-
+epochs=2
 def infinite_generator(generator):
     while True:
         for batch in generator:
@@ -138,10 +137,14 @@ def infinite_generator(generator):
 train_data_gen_inf = infinite_generator(train_data_gen)
 val_data_gen_inf = infinite_generator(val_data_gen)
 
-history = model.fit(train_data_gen_inf, steps_per_epoch=total_train // BATCH_SIZE, 
-                    epochs=epochs,
-                    validation_data=val_data_gen_inf,
-                    validation_steps=total_validation // BATCH_SIZE)
+history = model.fit(
+    train_data_gen_inf,
+    steps_per_epoch=int(np.ceil(total_train / float(BATCH_SIZE))),
+    epochs=epochs,
+    validation_data=val_data_gen_inf,
+    validation_steps=int(np.ceil(total_validation / float(BATCH_SIZE))),
+    verbose= 1
+)
 
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
@@ -150,6 +153,7 @@ loss = history.history['loss']
 val_loss = history.history['val_loss']
 
 epochs_range = range(epochs)
+print(epochs_range)
 
 plt.figure(figsize=(8, 8))
 plt.subplot(1, 2, 1)
