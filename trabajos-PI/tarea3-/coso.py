@@ -17,17 +17,17 @@ train_dir = '/content/drive/My Drive/dataset/train'
 validation_dir = '/content/drive/My Drive/dataset/validation'
 test_dir = '/content/drive/My Drive/dataset/test'
 
-def preprocess_image(image_path):
+def procesamiento_Imagenes(image_path):
     img = cv2.imread(image_path)  # Cargar imagen con OpenCV
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convertir a blanco y negro
     return cv2.cvtColor(gray_img, cv2.COLOR_GRAY2BGR)  # Convertir de nuevo a tres canales
 
-class CustomImageDataGenerator(ImageDataGenerator):
+class MiImageDataGenerator(ImageDataGenerator):# el error es aproposito para identificar donde hacer los cambios
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x = super()._get_batches_of_transformed_samples(index_array)
         for i in range(len(batch_x)):
             img_path = self.filepaths[index_array[i]]
-            batch_x[i] = preprocess_image(img_path)  # Preprocesar la imagen
+            batch_x[i] = procesamiento_Imagenes(img_path)  # Preprocesar la imagen
         return batch_x
 
 image_gen_train = CustomImageDataGenerator(rescale=1./255, rotation_range=40, width_shift_range=0.2, height_shift_range=0.2, shear_range=0.2,

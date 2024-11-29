@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import tkinter as tk 
 from tkinter import filedialog 
-from PIL import Image, ImageTk 
 
 # Crear ventana oculta para usar el diálogo 
 root = tk.Tk() 
