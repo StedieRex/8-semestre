@@ -22,7 +22,7 @@ asegurar_directorio(carpeta_destino)
 
 # Subcarpetas y clases
 subcarpetas = ['train', 'validation', 'test']
-clases = ['bcc', 'nv']  # Puedes agregar más clases en esta lista en el futuro
+clases = ['bcc','nv','bkl','df','mel']  # Puedes agregar más clases en esta lista en el futuro
 
 # Procesar imágenes
 for subcarpeta in subcarpetas:
